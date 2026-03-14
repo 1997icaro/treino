@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Treino</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#000;color:#fff;max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:80px}
+
+/* CONFIG BANNER */
+.config-banner{background:#1a1a00;border:1px solid #444400;border-radius:12px;padding:14px 16px;margin:16px;display:flex;align-items:flex-start;gap:10px}
+.config-banner.hidden{display:none}
+.config-banner-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.config-banner-text{flex:1;font-size:13px;color:#ccc;line-height:1.5}
+.config-banner-text b{color:#ffd166}
+.config-url-inp{width:100%;background:#111;border:1px solid #444;border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;margin-top:8px;font-family:monospace}
+.config-url-inp:focus{outline:none;border-color:#3b82f6}
+.btn-config-save{background:#3b82f6;border:none;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;width:100%}
+
+/* NAVBAR */
+.navbar{background:#111;padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
+.nav-title{font-size:22px;font-weight:700;letter-spacing:-.3px}
+.nav-icon-btn{background:#222;border:none;color:#fff;width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nav-icon-btn:active{opacity:.7}
+
+/* BOTTOM NAV */
+.btm-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#111;border-top:1px solid #222;display:flex;padding:8px 0 16px}
+.btm-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#666;cursor:pointer;border:none;background:transparent;padding:4px 0;transition:color .15s}
+.btm-tab .ti{font-size:22px}
+.btm-tab.active{color:#3b82f6}
+
+/* PAGES */
+.page{display:none;padding:16px}
+.page.active{display:block}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:#555;font-size:14px}
+.spinner{width:20px;height:20px;border:2px solid #333;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ROTINAS */
+.btn-row{display:flex;gap:10px;margin-bottom:20px}
+.btn-rotina-action{flex:1;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-rotina-action:active{opacity:.7}
+.section-label{font-size:13px;font-weight:600;color:#aaa;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rotina-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:16px;margin-bottom:12px}
+.rotina-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.rotina-card-name{font-size:16px;font-weight:700}
+.rotina-card-more{color:#555;font-size:20px;background:transparent;border:none;cursor:pointer;padding:0 4px;line-height:1}
+.rotina-card-exs{font-size:13px;color:#777;margin-bottom:14px;line-height:1.4}
+.btn-iniciar{width:100%;background:#3b82f6;border:none;color:#fff;padding:13px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-iniciar:active{background:#2563eb;transform:scale(.98)}
+.treinos-letras{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.btn-letra{background:#1a2a3a;border:1px solid #2a4a6a;color:#3b82f6;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex:1;min-width:40px}
+.btn-letra:active{background:#2a3a4a}
+
+/* TREINO ATIVO */
+.treino-ativo-bar{background:#111;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222}
+.ta-left{display:flex;align-items:center;gap:10px}
+.ta-chev{color:#3b82f6;font-size:22px;cursor:pointer;background:none;border:none;padding:0 4px}
+.ta-aluno{font-size:11px;color:#555}
+.ta-title{font-size:15px;font-weight:700}
+.btn-concluir{background:#3b82f6;border:none;color:#fff;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.stats-bar{background:#111;padding:10px 16px;display:flex;gap:24px;border-bottom:1px solid #1a1a1a}
+.sb-item{display:flex;flex-direction:column;gap:2px}
+.sb-val{font-size:14px;font-weight:600;color:#3b82f6}
+.sb-lbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+
+/* EX BLOCK */
+.ex-block{border-bottom:1px solid #1a1a1a;padding:16px}
+.ex-block-name{font-size:16px;font-weight:700;color:#3b82f6;margin-bottom:3px}
+.ex-block-ref{font-size:12px;color:#555;margin-bottom:12px}
+.col-headers{display:grid;grid-template-columns:32px 1fr 72px 72px 40px;gap:4px;padding:0 4px;margin-bottom:6px}
+.col-headers span{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;text-align:center}
+.col-headers span:first-child{text-align:left}
+.serie-row{display:grid;grid-template-columns:32px 1fr 72px 72px 40px;gap:4px;align-items:center;padding:4px;border-radius:8px;margin-bottom:4px;transition:background .2s}
+.serie-row.done{background:rgba(59,130,246,.08)}
+.s-badge{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:#222;color:#888}
+.s-badge.done{background:rgba(59,130,246,.2);color:#3b82f6}
+.s-prev{font-size:12px;color:#555;text-align:center}
+.s-inp{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:7px 4px;color:#fff;font-size:15px;font-weight:600;text-align:center;width:100%;-webkit-appearance:none}
+.s-inp:focus{outline:none;border-color:#3b82f6;background:#111}
+.s-inp[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.s-inp.filled{background:#1a2a3a;border-color:#2a4a6a}
+.s-check{width:32px;height:32px;border-radius:8px;border:2px solid #333;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;margin:0 auto;font-size:0}
+.s-check.checked{background:#3b82f6;border-color:#3b82f6;font-size:16px}
+.s-check.checked::after{content:'✓';color:#fff;font-weight:700}
+.btn-add-serie{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-add-serie:active{background:#222}
+
+/* ALUNOS */
+.aluno-item{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.aluno-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.aluno-sub{font-size:12px;color:#666}
+.act-btn{background:#222;border:none;color:#aaa;width:30px;height:30px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.act-btn:active{opacity:.7}
+
+/* BIBLIOTECA */
+.bib-group{margin-bottom:16px}
+.bib-group-name{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.bib-item{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.bib-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.bib-sub{font-size:12px;color:#555}
+
+/* HISTÓRICO */
+.hist-date{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px}
+.hist-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:8px}
+.hist-ex-name{font-size:14px;font-weight:700;color:#3b82f6;margin-bottom:10px}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px}
+.empty-ico{font-size:48px;margin-bottom:16px}
+.empty-t{font-size:18px;font-weight:700;color:#555;margin-bottom:8px}
+.empty-s{font-size:14px;color:#333}
+
+/* SHEETS / MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex;animation:fo .2s}
+@keyframes fo{from{opacity:0}to{opacity:1}}
+.sheet{background:#1a1a1a;border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-width:480px;animation:su .25s ease;max-height:90vh;overflow-y:auto}
+@keyframes su{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet-handle{width:40px;height:4px;background:#333;border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-size:18px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.sheet-x{background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1;padding:0}
+.f-label{font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;margin-top:14px}
+.f-input{width:100%;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;color:#fff;font-size:15px}
+.f-input:focus{outline:none;border-color:#3b82f6}
+.f-input::placeholder{color:#444}
+.f-select{width:100%;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;color:#fff;font-size:15px;appearance:none;-webkit-appearance:none;cursor:pointer}
+.f-select:focus{outline:none;border-color:#3b82f6}
+.btn-sheet-ok{width:100%;background:#3b82f6;border:none;color:#fff;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:18px}
+.btn-sheet-ok:active{background:#2563eb}
+.divider{height:1px;background:#222;margin:16px 0}
+.lbl-sec{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:block}
+.srch-inp{width:100%;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;margin-bottom:12px}
+.srch-inp:focus{outline:none;border-color:#3b82f6}
+.srch-inp::placeholder{color:#444}
+.srch-item{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.srch-item:active{background:#1a2a3a}
+.et-item{background:#111;border:1px solid #222;border-radius:10px;padding:11px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.t-item{background:#111;border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;align-items:center;gap:12px}
+.t-letra{font-size:24px;font-weight:800;color:#3b82f6;width:28px;flex-shrink:0}
+.t-info{flex:1}
+.t-nome{font-size:14px;font-weight:600;margin-bottom:2px}
+.t-foco{font-size:12px;color:#666}
+.t-badge{background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px;font-weight:700;padding:3px 8px;border-radius:100px}
+.ativa-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:4px}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER -->
+<div class="config-banner" id="config-banner">
+  <div class="config-banner-icon">⚙️</div>
+  <div class="config-banner-text">
+    <b>Configure a URL do Apps Script</b><br>
+    Cole abaixo a URL do Web App publicado no Google Apps Script da sua planilha.
+    <input class="config-url-inp" id="config-url" placeholder="https://script.google.com/macros/s/...">
+    <button class="btn-config-save" onclick="salvarConfig()">💾 Salvar e Conectar</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-title" id="nav-title">Treino</div>
+  <div style="display:flex;gap:8px">
+    <button class="nav-icon-btn" id="btn-sync" onclick="syncAll()" title="Sincronizar">🔄</button>
+    <button class="nav-icon-btn" onclick="goTab('alunos')" title="Alunos">👥</button>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="page active" id="page-rotinas">
+  <div class="btn-row">
+    <button class="btn-rotina-action" onclick="openSheet('sh-nova-rotina')">📋 Nova Rotina</button>
+    <button class="btn-rotina-action" onclick="goTab('biblioteca')">🔍 Exercícios</button>
+  </div>
+  <div class="section-label">▼ <span id="rotinas-lbl">Minhas Rotinas</span></div>
+  <div id="rotinas-list"></div>
+</div>
+
+<div class="page" id="page-treino">
+  <div id="treino-content"></div>
+</div>
+
+<div class="page" id="page-alunos">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:20px;font-weight:700">Alunos</div>
+    <button class="nav-icon-btn" onclick="openSheet('sh-novo-aluno')">＋</button>
+  </div>
+  <div id="alunos-list"></div>
+</div>
+
+<div class="page" id="page-biblioteca">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:20px;font-weight:700">Exercícios</div>
+    <button class="nav-icon-btn" onclick="openSheet('sh-novo-ex')">＋</button>
+  </div>
+  <input class="srch-inp" id="srch-bib" placeholder="🔍 Buscar..." oninput="renderBib()">
+  <div id="bib-list"></div>
+</div>
+
+<div class="page" id="page-hist">
+  <div style="font-size:20px;font-weight:700;margin-bottom:14px">Histórico</div>
+  <div id="hist-list"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="btm-nav">
+  <button class="btm-tab active" onclick="goTab('rotinas')"><span class="ti">🏠</span>Início</button>
+  <button class="btm-tab" onclick="goTab('rotinas')"><span class="ti">🏋️</span>Treino</button>
+  <button class="btm-tab" onclick="goTab('alunos')"><span class="ti">👤</span>Perfil</button>
+</div>
+
+<!-- SHEETS -->
+
+<!-- Nova Rotina -->
+<div class="overlay" id="sh-nova-rotina">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Nova Rotina <button class="sheet-x" onclick="closeSheet('sh-nova-rotina')">✕</button></div>
+    <label class="f-label">Aluno</label>
+    <select class="f-select" id="nr-aluno"></select>
+    <label class="f-label">Nome da Rotina</label>
+    <input class="f-input" id="nr-nome" placeholder="Ex: Push / Pull / Legs">
+    <label class="f-label">Início</label>
+    <input type="date" class="f-input" id="nr-ini">
+    <label class="f-label">Fim</label>
+    <input type="date" class="f-input" id="nr-fim">
+    <button class="btn-sheet-ok" onclick="salvarRotina()">Criar Rotina</button>
+  </div>
+</div>
+
+<!-- Novo Aluno -->
+<div class="overlay" id="sh-novo-aluno">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="sh-aluno-title">Novo Aluno</span><button class="sheet-x" onclick="closeSheet('sh-novo-aluno')">✕</button></div>
+    <input type="hidden" id="edit-aluno-id">
+    <label class="f-label">Nome</label>
+    <input class="f-input" id="na-nome" placeholder="Ex: João Silva">
+    <label class="f-label">Objetivo</label>
+    <select class="f-select" id="na-obj">
+      <option>Hipertrofia</option><option>Emagrecimento</option><option>Condicionamento</option><option>Força</option><option>Reabilitação</option>
+    </select>
+    <label class="f-label">Observações</label>
+    <input class="f-input" id="na-obs" placeholder="Ex: Lesão no joelho...">
+    <button class="btn-sheet-ok" onclick="salvarAluno()">Salvar</button>
+  </div>
+</div>
+
+<!-- Gerenciar Rotina -->
+<div class="overlay" id="sh-rotina">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="sh-rot-title">Rotina</span><button class="sheet-x" onclick="closeSheet('sh-rotina')">✕</button></div>
+    <input type="hidden" id="sh-rot-id">
+    <div id="sh-rot-treinos"></div>
+    <div class="divider"></div>
+    <span class="lbl-sec">Novo Treino</span>
+    <div style="display:flex;gap:8px">
+      <div style="width:70px"><label class="f-label">Letra</label>
+        <select class="f-select" id="nt-letra"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select></div>
+      <div style="flex:1"><label class="f-label">Foco Muscular</label>
+        <input class="f-input" id="nt-foco" placeholder="Ex: Push — Peito/Tríceps"></div>
+    </div>
+    <button class="btn-sheet-ok" onclick="salvarTreino()" style="margin-top:12px">+ Adicionar Treino</button>
+  </div>
+</div>
+
+<!-- Exercícios do Treino -->
+<div class="overlay" id="sh-et">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="sh-et-title">Exercícios</span><button class="sheet-x" onclick="closeSheet('sh-et')">✕</button></div>
+    <input type="hidden" id="sh-et-tid">
+    <div id="sh-et-list"></div>
+    <div class="divider"></div>
+    <span class="lbl-sec">Adicionar Exercício</span>
+    <input class="srch-inp" id="srch-et" placeholder="🔍 Buscar na biblioteca..." oninput="renderEtSearch()">
+    <div id="et-srch-res"></div>
+    <div id="et-cfg" style="display:none">
+      <label class="f-label">Exercício</label>
+      <input class="f-input" id="et-cfg-nome" readonly style="color:#3b82f6">
+      <input type="hidden" id="et-cfg-id">
+      <div style="display:flex;gap:8px;margin-top:2px">
+        <div style="flex:1"><label class="f-label">Séries</label><input type="number" class="f-input" id="et-s" value="3" min="1"></div>
+        <div style="flex:1"><label class="f-label">Rep Min</label><input type="number" class="f-input" id="et-rmin" value="8" min="1"></div>
+        <div style="flex:1"><label class="f-label">Rep Max</label><input type="number" class="f-input" id="et-rmax" value="12" min="1"></div>
+      </div>
+      <label class="f-label">Carga Referência</label>
+      <input class="f-input" id="et-carga" placeholder="Ex: 80kg">
+      <button class="btn-sheet-ok" onclick="salvarEt()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Exercício -->
+<div class="overlay" id="sh-novo-ex">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Novo Exercício <button class="sheet-x" onclick="closeSheet('sh-novo-ex')">✕</button></div>
+    <label class="f-label">Nome</label>
+    <input class="f-input" id="ne-nome" placeholder="Ex: Rosca Concentrada">
+    <label class="f-label">Grupo Muscular</label>
+    <select class="f-select" id="ne-grupo">
+      <option>Peito</option><option>Upper back</option><option>Latissimo</option><option>Bíceps</option><option>Tríceps</option><option>Deltoides</option><option>Upper Traps</option><option>Quadriceps</option><option>Isquiotibiais</option><option>Glúteo</option><option>Panturrilhas</option><option>ABS</option><option>Full Body</option>
+    </select>
+    <label class="f-label">Equipamento</label>
+    <select class="f-select" id="ne-equip">
+      <option>Barra</option><option>Halteres</option><option>Máquina</option><option>Polia</option><option>Peso corporal</option><option>Elástico</option>
+    </select>
+    <button class="btn-sheet-ok" onclick="salvarEx()">Salvar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+let API_URL = localStorage.getItem('pt_api_url') || '';
+
+function salvarConfig() {
+  const url = document.getElementById('config-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) { toast('URL inválida!', '#ff4d6d'); return; }
+  API_URL = url;
+  localStorage.setItem('pt_api_url', url);
+  document.getElementById('config-banner').classList.add('hidden');
+  toast('✓ Conectado! Carregando dados...', '#22c55e');
+  syncAll();
+}
+
+function checkConfig() {
+  if (!API_URL) {
+    document.getElementById('config-banner').classList.remove('hidden');
+  } else {
+    document.getElementById('config-banner').classList.add('hidden');
+  }
+}
+
+// ══ STORAGE LOCAL (cache) ══
+const ld = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } };
+const sv = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const today = () => new Date().toLocaleDateString('pt-BR');
+
+// Cache local — fallback quando offline
+const DB = {
+  alunos: ld('pt_alunos', []),
+  rotinas: ld('pt_rotinas', []),
+  treinos: ld('pt_treinos', []),
+  et: ld('pt_et', []),
+  exercicios: ld('pt_exercicios', []),
+  exec: ld('pt_exec', []),
+};
+
+const persist = () => {
+  sv('pt_alunos', DB.alunos); sv('pt_rotinas', DB.rotinas);
+  sv('pt_treinos', DB.treinos); sv('pt_et', DB.et);
+  sv('pt_exercicios', DB.exercicios); sv('pt_exec', DB.exec);
+};
+
+// ══ API HELPERS (JSONP para contornar CORS) ══
+function apiGet(action, params = {}) {
+  return new Promise((resolve) => {
+    if (!API_URL) { resolve(null); return; }
+    const cbName = 'cb_' + Date.now();
+    const qs = new URLSearchParams({ action, callback: cbName, ...params });
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(null);
+    }, 10000);
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.src = `${API_URL}?${qs}`;
+    script.onerror = () => { clearTimeout(timeout); resolve(null); };
+    document.body.appendChild(script);
+  });
+}
+
+function apiPost(action, data) {
+  return new Promise((resolve) => {
+    if (!API_URL) { resolve(null); return; }
+    // Para POST usamos GET com parâmetros codificados (Apps Script não suporta POST cross-origin)
+    const cbName = 'cb_' + Date.now();
+    const payload = encodeURIComponent(JSON.stringify(data));
+    const qs = new URLSearchParams({ action, callback: cbName, payload });
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      if (document.body.contains(script)) document.body.removeChild(script);
+      resolve(null);
+    }, 10000);
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (document.body.contains(script)) document.body.removeChild(script);
+      resolve(data);
+    };
+    script.src = `${API_URL}?${qs}`;
+    script.onerror = () => { clearTimeout(timeout); resolve(null); };
+    document.body.appendChild(script);
+  });
+}
+
+// ══ SYNC ══
+async function syncAll() {
+  if (!API_URL) return;
+  document.getElementById('btn-sync').textContent = '⏳';
+  try {
+    // Mapeamento: campo Sheets → campo interno
+    const [alunos, rotinas, treinos, et, exercicios] = await Promise.all([
+      apiGet('getAlunos'),
+      apiGet('getRotinas'),
+      apiGet('getTreinos'),
+      apiGet('getExercTreino'),
+      apiGet('getExercicios'),
+    ]);
+
+    if (alunos) {
+      DB.alunos = alunos.map(r => ({
+        id: r.ID_Aluno, nome: r.Nome, obj: r.Objetivo, obs: r.Obs || ''
+      }));
+    }
+    if (rotinas) {
+      DB.rotinas = rotinas.map(r => ({
+        id: r.ID_Rotina, id_aluno: r.ID_Aluno, nome: r.Nome_Rotina || r.Nome,
+        ini: r.Data_Inicio, fim: r.Data_Fim, ativa: r.Ativa === 'Sim' || r.Ativa === true
+      }));
+    }
+    if (treinos) {
+      DB.treinos = treinos.map(r => ({
+        id: r.ID_Treino, id_rotina: r.ID_Rotina,
+        letra: r.Letra_Treino, foco: r.Nome_Treino || r.Foco_Muscular || r.Letra_Treino,
+        ordem: r.Ordem || 0
+      }));
+    }
+    if (et) {
+      DB.et = et.map(r => ({
+        id: r.ID_ExercTreino, id_treino: r.ID_Treino, id_ex: String(r.ID_Exercicio),
+        nome: r.Nome_Exercicio || '', series: parseInt(r.Series_Prog) || 3,
+        rmin: parseInt(r.Reps_Min) || 8, rmax: parseInt(r.Reps_Max) || 12,
+        carga: r.Carga_Referencia || '—', ordem: parseInt(r.Ordem) || 1
+      }));
+    }
+    if (exercicios) {
+      DB.exercicios = exercicios.map(r => ({
+        id: String(r.ID_Exercicio), nome: r.Nome_Exercicio || r.Nome,
+        grupo: r.Grupo_Muscular || r.Grupo, equip: r.Equipamento || ''
+      }));
+    }
+
+    // Sync execuções (só do mês atual para não travar)
+    const exec = await apiGet('getExecucao');
+    if (exec) {
+      DB.exec = exec.map(r => ({
+        id: r.ID_Exec, data: formatData(r.Data),
+        id_aluno: r.ID_Aluno, id_treino: r.ID_Treino,
+        id_ex: String(r.ID_Exercicio), nome_ex: r.Nome_Exercicio || '',
+        idx: parseInt(r.Numero_Serie) - 1 || 0,
+        reps: parseInt(r.Reps_Feitas) || 0,
+        peso: parseFloat(r.Peso_Kg) || 0,
+        rir: parseInt(r.RIR) || 0, obs: r.Obs || ''
+      }));
+    }
+
+    persist();
+    toast('✓ Sincronizado!', '#22c55e');
+    renderRotinas();
+    if (ST.tab === 'alunos') renderAlunos();
+    if (ST.tab === 'biblioteca') renderBib();
+  } catch (e) {
+    toast('Erro ao sincronizar', '#ff4d6d');
+    console.error(e);
+  }
+  document.getElementById('btn-sync').textContent = '🔄';
+}
+
+function formatData(val) {
+  if (!val) return today();
+  if (typeof val === 'string' && val.includes('/')) return val;
+  const d = new Date(val);
+  if (isNaN(d)) return String(val);
+  return d.toLocaleDateString('pt-BR');
+}
+
+function getSemana() {
+  const d = new Date(), oj = new Date(d.getFullYear(), 0, 1);
+  const w = Math.ceil((((d - oj) / 86400000) + oj.getDay() + 1) / 7);
+  return `Sem ${String(w).padStart(2, '0')}/${d.getFullYear()}`;
+}
+
+// ══ TOAST ══
+function toast(msg, color = '#fff') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = color;
+  t.style.color = color === '#fff' ? '#000' : '#fff';
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══ SHEETS ══
+function openSheet(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'flex'; setTimeout(() => el.classList.add('open'), 10);
+}
+function closeSheet(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('open'); setTimeout(() => el.style.display = 'none', 220);
+}
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeSheet(o.id); }));
+
+// ══ STATE ══
+const ST = { tab: 'rotinas', treinoAtivo: null, timer: 0, timerInt: null };
+
+// ══ TABS ══
+function goTab(tab) {
+  ST.tab = tab;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.btm-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+  const tabMap = { rotinas: 0, treino: 1, alunos: 2, biblioteca: 1, hist: 2 };
+  document.querySelectorAll('.btm-tab')[tabMap[tab] || 0]?.classList.add('active');
+  document.getElementById('nav-title').textContent = { rotinas: 'Treino', treino: 'Treinamento', alunos: 'Alunos', biblioteca: 'Exercícios', hist: 'Histórico' }[tab] || 'Treino';
+  if (tab === 'rotinas') renderRotinas();
+  if (tab === 'alunos') renderAlunos();
+  if (tab === 'biblioteca') renderBib();
+  if (tab === 'hist') renderHist();
+}
+
+// ══════════════════════════════
+// ROTINAS
+// ══════════════════════════════
+function renderRotinas() {
+  // Popula select de aluno na nova rotina
+  const sel = document.getElementById('nr-aluno');
+  sel.innerHTML = ''; DB.alunos.forEach(a => sel.innerHTML += `<option value="${a.id}">${a.nome}</option>`);
+
+  const list = document.getElementById('rotinas-list');
+  if (!DB.rotinas.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-ico">🏋️</div><div class="empty-t">Nenhuma rotina</div><div class="empty-s">Clique em "Nova Rotina" para começar</div></div>`;
+    document.getElementById('rotinas-lbl').textContent = 'Minhas Rotinas (0)';
+    return;
+  }
+  document.getElementById('rotinas-lbl').textContent = `Minhas Rotinas (${DB.rotinas.length})`;
+
+  list.innerHTML = DB.rotinas.map(r => {
+    const aluno = DB.alunos.find(a => a.id === r.id_aluno);
+    const treinos = DB.treinos.filter(t => t.id_rotina === r.id).sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+    const exNomes = treinos.flatMap(t => DB.et.filter(e => e.id_treino === t.id).slice(0, 2).map(e => e.nome)).slice(0, 4).join(', ');
+    return `<div class="rotina-card">
+      <div class="rotina-card-top">
+        <div>
+          <div class="rotina-card-name">${r.nome}</div>
+          <div style="font-size:12px;color:#555;margin-top:2px">${aluno?.nome || '—'} • ${treinos.length} treino(s)${r.ativa ? ' <span style="color:#22c55e">●</span>' : ''}</div>
+        </div>
+        <button class="rotina-card-more" onclick="openGerenciarRotina('${r.id}')">⋯</button>
+      </div>
+      <div class="rotina-card-exs">${exNomes || 'Nenhum exercício configurado'}</div>
+      <div class="treinos-letras">
+        ${treinos.map(t => `<button class="btn-letra" onclick="iniciarTreino('${t.id}')">${t.letra}</button>`).join('')}
+      </div>
+      <button class="btn-iniciar" onclick="iniciarTreino('${treinos[0]?.id || ''}')">Iniciar Rotina</button>
+    </div>`;
+  }).join('');
+}
+
+async function salvarRotina() {
+  const nome = document.getElementById('nr-nome').value.trim();
+  if (!nome) { toast('Digite o nome!', '#ff4d6d'); return; }
+  const idAluno = document.getElementById('nr-aluno').value;
+  const ini = document.getElementById('nr-ini').value;
+  const fim = document.getElementById('nr-fim').value;
+  const nova = { id: 'ROT' + uid(), id_aluno: idAluno, nome, ini, fim, ativa: true };
+  DB.rotinas.push(nova); persist(); renderRotinas(); closeSheet('sh-nova-rotina');
+  document.getElementById('nr-nome').value = '';
+  toast('✓ Rotina criada!', '#22c55e');
+  // Salva no Sheets
+  apiPost('salvarRotina', {
+    ID_Rotina: nova.id, ID_Aluno: idAluno, Nome_Rotina: nome,
+    Data_Inicio: ini, Data_Fim: fim, Ativa: 'Sim'
+  });
+}
+
+function openGerenciarRotina(rotId) {
+  const rot = DB.rotinas.find(r => r.id === rotId);
+  document.getElementById('sh-rot-title').textContent = rot.nome;
+  document.getElementById('sh-rot-id').value = rotId;
+  document.getElementById('nt-foco').value = '';
+  renderSheetTreinos(rotId);
+  openSheet('sh-rotina');
+}
+
+function renderSheetTreinos(rotId) {
+  const treinos = DB.treinos.filter(t => t.id_rotina === rotId);
+  const list = document.getElementById('sh-rot-treinos');
+  if (!treinos.length) { list.innerHTML = `<div style="color:#555;font-size:13px;padding:6px 0">Nenhum treino ainda. Adicione abaixo.</div>`; return; }
+  list.innerHTML = treinos.map(t => {
+    const exCount = DB.et.filter(e => e.id_treino === t.id).length;
+    return `<div class="t-item">
+      <div class="t-letra">${t.letra}</div>
+      <div class="t-info"><div class="t-nome">Treino ${t.letra}</div><div class="t-foco">${t.foco}</div></div>
+      <span class="t-badge">${exCount} ex</span>
+      <button onclick="openSheetEt('${t.id}')" style="background:none;border:none;color:#3b82f6;font-size:18px;cursor:pointer;padding:4px;margin-left:4px">💪</button>
+      <button onclick="delTreino('${t.id}')" style="background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:4px">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+async function salvarTreino() {
+  const rotId = document.getElementById('sh-rot-id').value;
+  const foco = document.getElementById('nt-foco').value.trim();
+  if (!foco) { toast('Digite o foco!', '#ff4d6d'); return; }
+  const letra = document.getElementById('nt-letra').value;
+  const novo = { id: 'TRE' + uid(), id_rotina: rotId, letra, foco, ordem: DB.treinos.filter(t => t.id_rotina === rotId).length + 1 };
+  DB.treinos.push(novo); persist(); renderSheetTreinos(rotId); renderRotinas();
+  document.getElementById('nt-foco').value = '';
+  toast('✓ Treino criado!', '#22c55e');
+  apiPost('salvarTreino', {
+    ID_Treino: novo.id, ID_Rotina: rotId, Letra_Treino: letra,
+    Nome_Treino: foco, Foco_Muscular: foco, Ordem: novo.ordem
+  });
+}
+
+async function delTreino(id) {
+  if (!confirm('Excluir este treino?')) return;
+  const t = DB.treinos.find(x => x.id === id);
+  DB.et = DB.et.filter(e => e.id_treino !== id);
+  DB.treinos = DB.treinos.filter(x => x.id !== id);
+  persist(); renderSheetTreinos(t.id_rotina); renderRotinas();
+  toast('Removido', '#ffd166');
+  apiPost('deletarTreino', { action: 'deletarTreino' }); // handled via doPost with body.id
+  fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deletarTreino', id }) });
+}
+
+// ══════════════════════════════
+// EXERCÍCIOS DO TREINO
+// ══════════════════════════════
+function openSheetEt(tid) {
+  const t = DB.treinos.find(x => x.id === tid);
+  document.getElementById('sh-et-title').textContent = `Treino ${t.letra} — ${t.foco}`;
+  document.getElementById('sh-et-tid').value = tid;
+  document.getElementById('et-cfg').style.display = 'none';
+  document.getElementById('srch-et').value = '';
+  document.getElementById('et-srch-res').innerHTML = '';
+  renderSheetEtList(tid);
+  openSheet('sh-et');
+}
+
+function renderSheetEtList(tid) {
+  const exercs = DB.et.filter(e => e.id_treino === tid).sort((a, b) => a.ordem - b.ordem);
+  const list = document.getElementById('sh-et-list');
+  if (!exercs.length) { list.innerHTML = `<div style="color:#555;font-size:13px;padding:4px 0 8px">Nenhum exercício. Busque abaixo para adicionar.</div>`; return; }
+  list.innerHTML = exercs.map((e, i) => `
+    <div class="et-item">
+      <div><div style="font-size:13px;font-weight:600;margin-bottom:2px">${i + 1}. ${e.nome}</div><div style="font-size:11px;color:#555">${e.series}×${e.rmin}-${e.rmax} reps • ${e.carga}</div></div>
+      <button onclick="delEt('${e.id}','${tid}')" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:4px">🗑</button>
+    </div>`).join('');
+}
+
+function renderEtSearch() {
+  const q = document.getElementById('srch-et').value.toLowerCase();
+  const res = document.getElementById('et-srch-res');
+  if (!q) { res.innerHTML = ''; return; }
+  const found = DB.exercicios.filter(e => e.nome.toLowerCase().includes(q) || e.grupo.toLowerCase().includes(q)).slice(0, 6);
+  res.innerHTML = found.map(e => `
+    <div class="srch-item" onclick="selEt('${e.id}','${e.nome}')">
+      <div><div style="font-size:13px;font-weight:600">${e.nome}</div><div style="font-size:11px;color:#555">${e.grupo} • ${e.equip}</div></div>
+      <div style="color:#3b82f6;font-size:22px;font-weight:700">＋</div>
+    </div>`).join('');
+  if (!found.length) res.innerHTML = `<div style="color:#555;font-size:13px;padding:6px 0">Nenhum resultado</div>`;
+}
+
+function selEt(id, nome) {
+  document.getElementById('et-cfg-id').value = id;
+  document.getElementById('et-cfg-nome').value = nome;
+  document.getElementById('et-cfg').style.display = 'block';
+  document.getElementById('et-srch-res').innerHTML = '';
+  document.getElementById('srch-et').value = '';
+}
+
+async function salvarEt() {
+  const tid = document.getElementById('sh-et-tid').value;
+  const exId = document.getElementById('et-cfg-id').value;
+  const nome = document.getElementById('et-cfg-nome').value;
+  const series = parseInt(document.getElementById('et-s').value) || 3;
+  const rmin = parseInt(document.getElementById('et-rmin').value) || 8;
+  const rmax = parseInt(document.getElementById('et-rmax').value) || 12;
+  const carga = document.getElementById('et-carga').value || '—';
+  const ordem = DB.et.filter(e => e.id_treino === tid).length + 1;
+  const novo = { id: 'ET' + uid(), id_treino: tid, id_ex: exId, nome, series, rmin, rmax, carga, ordem };
+  DB.et.push(novo); persist(); renderSheetEtList(tid); renderRotinas();
+  document.getElementById('et-cfg').style.display = 'none';
+  toast('✓ Exercício adicionado!', '#22c55e');
+  apiPost('salvarExercTreino', {
+    ID_ExercTreino: novo.id, ID_Treino: tid, ID_Exercicio: exId,
+    Nome_Exercicio: nome, Series_Prog: series, Reps_Min: rmin,
+    Reps_Max: rmax, Carga_Referencia: carga, Ordem: ordem
+  });
+  // Atualiza treino ativo se aberto
+  if (ST.treinoAtivo === tid) {
+    const t = DB.treinos.find(x => x.id === tid);
+    renderTreinoAtivo(t);
+  }
+}
+
+async function delEt(etId, tid) {
+  if (!confirm('Remover exercício?')) return;
+  DB.et = DB.et.filter(e => e.id !== etId);
+  DB.et.filter(e => e.id_treino === tid).sort((a, b) => a.ordem - b.ordem).forEach((e, i) => e.ordem = i + 1);
+  persist(); renderSheetEtList(tid); renderRotinas();
+  toast('Removido', '#ffd166');
+  fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deletarExercTreino', id: etId }) });
+}
+
+// ══════════════════════════════
+// TREINO ATIVO
+// ══════════════════════════════
+function iniciarTreino(tid) {
+  if (!tid) { toast('Configure exercícios primeiro!', '#ff4d6d'); return; }
+  const t = DB.treinos.find(x => x.id === tid);
+  if (!t) { toast('Treino não encontrado', '#ff4d6d'); return; }
+  ST.treinoAtivo = tid;
+  ST.timer = 0;
+  if (ST.timerInt) clearInterval(ST.timerInt);
+  ST.timerInt = setInterval(() => { ST.timer++; updateTimer(); }, 1000);
+  renderTreinoAtivo(t);
+  goTab('treino');
+}
+
+function updateTimer() {
+  const el = document.getElementById('ta-timer');
+  if (!el) return;
+  const m = Math.floor(ST.timer / 60), s = ST.timer % 60;
+  el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function renderTreinoAtivo(t) {
+  const exercs = DB.et.filter(e => e.id_treino === t.id).sort((a, b) => a.ordem - b.ordem);
+  const rot = DB.rotinas.find(r => r.id === t.id_rotina);
+  const aluno = DB.alunos.find(a => a.id === rot?.id_aluno);
+
+  document.getElementById('treino-content').innerHTML = `
+    <div style="position:sticky;top:56px;z-index:50;background:#000">
+      <div class="treino-ativo-bar">
+        <div class="ta-left">
+          <button class="ta-chev" onclick="voltarRotinas()">‹</button>
+          <div>
+            <div class="ta-aluno">${aluno?.nome || ''}</div>
+            <div class="ta-title">Treino ${t.letra} — ${(t.foco||'').split('—')[0]?.trim() || t.foco}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:#3b82f6;font-size:14px;font-weight:600" id="ta-timer">00:00</span>
+          <button class="btn-concluir" onclick="concluirTreino()">Concluir</button>
+        </div>
+      </div>
+      <div class="stats-bar">
+        <div class="sb-item"><div class="sb-val" id="sb-dur">00:00</div><div class="sb-lbl">Duração</div></div>
+        <div class="sb-item"><div class="sb-val" id="sb-vol">0 kg</div><div class="sb-lbl">Volume</div></div>
+        <div class="sb-item"><div class="sb-val" id="sb-series">0</div><div class="sb-lbl">Séries</div></div>
+      </div>
+    </div>
+    <div id="ex-blocks">
+      ${exercs.length ? exercs.map(ex => buildExBlock(ex, t.id)).join('') : '<div class="empty-state"><div class="empty-ico">💪</div><div class="empty-t">Nenhum exercício</div><div class="empty-s">Adicione exercícios a este treino</div></div>'}
+    </div>
+    <div style="padding:16px">
+      <button onclick="openSheetEt('${t.id}')" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">+ Adicionar Exercício</button>
+    </div>`;
+}
+
+function buildExBlock(ex, tid) {
+  const prevSeries = getPrevSeries(ex.id_ex, tid);
+  const rows = Array.from({ length: ex.series }, (_, i) => {
+    const p = prevSeries[i];
+    const prevStr = p ? `${p.peso}kg x ${p.reps}` : '—';
+    return `<div class="serie-row" id="sr-${ex.id}-${i}">
+      <div class="s-badge" id="sb-${ex.id}-${i}">${i + 1}</div>
+      <div class="s-prev">${prevStr}</div>
+      <input type="number" class="s-inp" id="sp-${ex.id}-${i}" placeholder="${p?.peso || ex.carga.replace(/[^0-9.]/g, '')}" min="0" step="0.5" oninput="onInp('${ex.id}',${i})">
+      <input type="number" class="s-inp" id="sr2-${ex.id}-${i}" placeholder="${p?.reps || ex.rmin}" min="1" oninput="onInp('${ex.id}',${i})">
+      <div class="s-check" id="sc-${ex.id}-${i}" onclick="checkSerie('${ex.id}',${i},'${tid}','${ex.id_ex}','${ex.nome}')"></div>
+    </div>`;
+  }).join('');
+
+  return `<div class="ex-block" id="exb-${ex.id}">
+    <div class="ex-block-name">${ex.nome}</div>
+    <div class="ex-block-ref">${ex.series} séries • ${ex.rmin}–${ex.rmax} reps • ref: ${ex.carga}</div>
+    <div class="col-headers"><span>SÉRIE</span><span>ANTERIOR</span><span>⚖ KG</span><span>REPS</span><span>✓</span></div>
+    ${rows}
+    <button class="btn-add-serie" onclick="addSerieExtra('${ex.id}','${tid}','${ex.id_ex}','${ex.nome}')">＋ Adicionar Série</button>
+  </div>`;
+}
+
+function onInp(exId, idx) {
+  const p = document.getElementById(`sp-${exId}-${idx}`).value;
+  const r = document.getElementById(`sr2-${exId}-${idx}`).value;
+  if (p) document.getElementById(`sp-${exId}-${idx}`).classList.add('filled');
+  if (r) document.getElementById(`sr2-${exId}-${idx}`).classList.add('filled');
+}
+
+async function checkSerie(exId, idx, tid, idEx, nomeEx) {
+  const peso = document.getElementById(`sp-${exId}-${idx}`).value;
+  const reps = document.getElementById(`sr2-${exId}-${idx}`).value;
+  const check = document.getElementById(`sc-${exId}-${idx}`);
+  const row = document.getElementById(`sr-${exId}-${idx}`);
+  const badge = document.getElementById(`sb-${exId}-${idx}`);
+
+  if (check.classList.contains('checked')) {
+    // Desmarcar
+    check.classList.remove('checked');
+    row.classList.remove('done');
+    badge.classList.remove('done');
+    DB.exec = DB.exec.filter(e => !(e.id_ex === exId && e.idx === idx && e.id_treino === tid && e.data === today()));
+    persist(); updateStats(tid);
+    return;
+  }
+
+  if (!peso || !reps) { toast('Preencha kg e reps primeiro!', '#ff4d6d'); return; }
+
+  check.classList.add('checked');
+  row.classList.add('done');
+  badge.classList.add('done');
+
+  const rot = DB.rotinas.find(r => DB.treinos.find(t => t.id === tid)?.id_rotina === r.id);
+  const execId = 'EXEC' + uid();
+
+  const registro = {
+    id: execId, data: today(), id_aluno: rot?.id_aluno || '',
+    id_treino: tid, id_ex: exId, nome_ex: nomeEx,
+    idx, reps: parseInt(reps), peso: parseFloat(peso), rir: 2, obs: ''
+  };
+
+  DB.exec = DB.exec.filter(e => !(e.id_ex === exId && e.idx === idx && e.id_treino === tid && e.data === today()));
+  DB.exec.push(registro); persist(); updateStats(tid);
+
+  // Salva no Sheets em background
+  apiPost('salvarExecucao', {
+    ID_Exec: execId, Data: today(), ID_Aluno: rot?.id_aluno || '',
+    ID_Treino: tid, ID_Exercicio: idEx, Nome_Exercicio: nomeEx,
+    Numero_Serie: idx + 1, Peso_Kg: parseFloat(peso),
+    Reps_Feitas: parseInt(reps), RIR: 2, Obs: '', Semana: getSemana()
+  });
+}
+
+function addSerieExtra(exId, tid, idEx, nomeEx) {
+  const et = DB.et.find(e => e.id === exId);
+  if (!et) return;
+  et.series++;
+  persist();
+  const idx = et.series - 1;
+  const prev = getPrevSeries(idEx, tid);
+  const p = prev[idx];
+  const prevStr = p ? `${p.peso}kg x ${p.reps}` : '—';
+  const block = document.getElementById(`exb-${exId}`);
+  const btn = block.querySelector('.btn-add-serie');
+  const newRow = document.createElement('div');
+  newRow.className = 'serie-row'; newRow.id = `sr-${exId}-${idx}`;
+  newRow.innerHTML = `
+    <div class="s-badge" id="sb-${exId}-${idx}">${idx + 1}</div>
+    <div class="s-prev">${prevStr}</div>
+    <input type="number" class="s-inp" id="sp-${exId}-${idx}" placeholder="${p?.peso || et.carga.replace(/[^0-9.]/g, '')}" min="0" step="0.5" oninput="onInp('${exId}',${idx})">
+    <input type="number" class="s-inp" id="sr2-${exId}-${idx}" placeholder="${p?.reps || et.rmin}" min="1" oninput="onInp('${exId}',${idx})">
+    <div class="s-check" id="sc-${exId}-${idx}" onclick="checkSerie('${exId}',${idx},'${tid}','${idEx}','${nomeEx}')"></div>`;
+  block.insertBefore(newRow, btn);
+}
+
+function updateStats(tid) {
+  const todays = DB.exec.filter(e => e.id_treino === tid && e.data === today());
+  const vol = todays.reduce((s, e) => s + (e.peso * e.reps), 0);
+  const vs = document.getElementById('sb-vol');
+  const ss = document.getElementById('sb-series');
+  if (vs) vs.textContent = `${Math.round(vol)} kg`;
+  if (ss) ss.textContent = todays.length;
+}
+
+function voltarRotinas() {
+  if (confirm('Sair do treino? O progresso foi salvo.')) {
+    if (ST.timerInt) clearInterval(ST.timerInt);
+    ST.treinoAtivo = null;
+    goTab('rotinas');
+  }
+}
+
+function concluirTreino() {
+  if (!confirm('Concluir o treino?')) return;
+  if (ST.timerInt) { clearInterval(ST.timerInt); ST.timerInt = null; }
+  ST.treinoAtivo = null;
+  toast('✓ Treino concluído! 💪', '#22c55e');
+  goTab('rotinas');
+}
+
+function getPrevSeries(idEx, tid) {
+  const prevExecs = DB.exec
+    .filter(e => e.id_ex === idEx && e.id_treino === tid && e.data !== today())
+    .sort((a, b) => b.id.localeCompare(a.id));
+  if (!prevExecs.length) return [];
+  const lastDate = prevExecs[0].data;
+  return DB.exec
+    .filter(e => e.id_ex === idEx && e.id_treino === tid && e.data === lastDate)
+    .sort((a, b) => a.idx - b.idx);
+}
+
+// ══════════════════════════════
+// ALUNOS
+// ══════════════════════════════
+function renderAlunos() {
+  const list = document.getElementById('alunos-list');
+  if (!DB.alunos.length) { list.innerHTML = `<div class="empty-state"><div class="empty-ico">👥</div><div class="empty-t">Nenhum aluno</div><div class="empty-s">Clique em ＋ para adicionar</div></div>`; return; }
+  list.innerHTML = DB.alunos.map(a => {
+    const rotinas = DB.rotinas.filter(r => r.id_aluno === a.id);
+    return `<div class="aluno-item">
+      <div style="flex:1">
+        <div class="aluno-name">📁 ${a.nome}</div>
+        <div class="aluno-sub">${a.obj} • ${rotinas.length} rotina(s)${a.obs ? ` • ⚠️ ${a.obs}` : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="act-btn" onclick="editAluno('${a.id}')">✏️</button>
+        <button class="act-btn" onclick="delAluno('${a.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function salvarAluno() {
+  const nome = document.getElementById('na-nome').value.trim();
+  if (!nome) { toast('Digite o nome!', '#ff4d6d'); return; }
+  const eid = document.getElementById('edit-aluno-id').value;
+  if (eid) {
+    const a = DB.alunos.find(x => x.id === eid);
+    a.nome = nome; a.obj = document.getElementById('na-obj').value; a.obs = document.getElementById('na-obs').value;
+    toast('✓ Atualizado!', '#22c55e');
+  } else {
+    const novo = { id: 'ALU' + uid(), nome, obj: document.getElementById('na-obj').value, obs: document.getElementById('na-obs').value };
+    DB.alunos.push(novo);
+    apiPost('salvarAluno', { ID_Aluno: novo.id, Nome: nome, Objetivo: novo.obj, Obs: novo.obs });
+    toast('✓ Aluno criado!', '#22c55e');
+  }
+  persist(); closeSheet('sh-novo-aluno'); renderAlunos(); renderRotinas();
+  document.getElementById('na-nome').value = ''; document.getElementById('edit-aluno-id').value = '';
+}
+
+function editAluno(id) {
+  const a = DB.alunos.find(x => x.id === id);
+  document.getElementById('sh-aluno-title').textContent = 'Editar Aluno';
+  document.getElementById('edit-aluno-id').value = id;
+  document.getElementById('na-nome').value = a.nome;
+  document.getElementById('na-obj').value = a.obj;
+  document.getElementById('na-obs').value = a.obs || '';
+  openSheet('sh-novo-aluno');
+}
+
+async function delAluno(id) {
+  if (!confirm('Excluir aluno e todos os dados?')) return;
+  DB.alunos = DB.alunos.filter(a => a.id !== id);
+  DB.rotinas = DB.rotinas.filter(r => r.id_aluno !== id);
+  DB.exec = DB.exec.filter(e => e.id_aluno !== id);
+  persist(); renderAlunos(); toast('Removido', '#ffd166');
+}
+
+// ══════════════════════════════
+// BIBLIOTECA
+// ══════════════════════════════
+function renderBib() {
+  const q = (document.getElementById('srch-bib')?.value || '').toLowerCase();
+  const list = document.getElementById('bib-list');
+  const exercs = DB.exercicios.filter(e => !q || e.nome.toLowerCase().includes(q) || e.grupo.toLowerCase().includes(q));
+  if (!exercs.length) { list.innerHTML = `<div class="empty-state"><div class="empty-ico">💪</div><div class="empty-t">Nenhum exercício</div></div>`; return; }
+  const grupos = [...new Set(exercs.map(e => e.grupo))].sort();
+  list.innerHTML = grupos.map(g => `
+    <div class="bib-group">
+      <div class="bib-group-name">${g}</div>
+      ${exercs.filter(e => e.grupo === g).map(e => `
+        <div class="bib-item">
+          <div><div class="bib-name">${e.nome}</div><div class="bib-sub">${e.equip}</div></div>
+          <button onclick="delEx('${e.id}')" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:4px">🗑</button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+async function salvarEx() {
+  const nome = document.getElementById('ne-nome').value.trim();
+  if (!nome) { toast('Digite o nome!', '#ff4d6d'); return; }
+  const grupo = document.getElementById('ne-grupo').value;
+  const equip = document.getElementById('ne-equip').value;
+  const novo = { id: 'EX' + uid(), nome, grupo, equip };
+  DB.exercicios.push(novo); persist(); closeSheet('sh-novo-ex'); renderBib();
+  toast('✓ Exercício criado!', '#22c55e');
+  document.getElementById('ne-nome').value = '';
+  apiPost('salvarExercicio', { ID_Exercicio: novo.id, Nome_Exercicio: nome, Grupo_Muscular: grupo, Equipamento: equip });
+}
+
+async function delEx(id) {
+  if (!confirm('Excluir da biblioteca?')) return;
+  DB.exercicios = DB.exercicios.filter(e => e.id !== id);
+  persist(); renderBib(); toast('Removido', '#ffd166');
+}
+
+// ══════════════════════════════
+// HISTÓRICO
+// ══════════════════════════════
+function renderHist() {
+  const list = document.getElementById('hist-list');
+  if (!DB.exec.length) { list.innerHTML = `<div class="empty-state"><div class="empty-ico">📊</div><div class="empty-t">Sem registros</div><div class="empty-s">Inicie um treino para ver o histórico</div></div>`; return; }
+  const sorted = [...DB.exec].sort((a, b) => b.id.localeCompare(a.id));
+  const byDate = {};
+  sorted.forEach(e => { if (!byDate[e.data]) byDate[e.data] = {}; if (!byDate[e.data][e.nome_ex]) byDate[e.data][e.nome_ex] = []; byDate[e.data][e.nome_ex].push(e); });
+  list.innerHTML = Object.entries(byDate).slice(0, 14).map(([data, exs]) => `
+    <div class="hist-date">${data}</div>
+    ${Object.entries(exs).map(([nome, series]) => `
+      <div class="hist-card">
+        <div class="hist-ex-name">${nome}</div>
+        <div class="col-headers"><span>S</span><span></span><span>KG</span><span>REPS</span><span></span></div>
+        ${series.sort((a, b) => a.idx - b.idx).map((s, i) => `
+          <div class="serie-row done">
+            <div class="s-badge done">${i + 1}</div><div></div>
+            <div style="text-align:center;font-size:14px">${s.peso}</div>
+            <div style="text-align:center;font-size:14px">${s.reps}</div>
+            <div></div>
+          </div>`).join('')}
+      </div>`).join('')}`).join('');
+}
+
+// ══ INIT ══
+checkConfig();
+if (API_URL) syncAll();
+else renderRotinas();
+</script>
+</body>
+</html>
