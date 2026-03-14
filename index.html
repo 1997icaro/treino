@@ -456,8 +456,8 @@ async function syncAll() {
     }
     if (exercicios) {
       DB.exercicios = exercicios.map(r => ({
-        id: String(r.ID_Exercicio), nome: r.Nome_Exercicio || r.Nome,
-        grupo: r.Grupo_Muscular || r.Grupo, equip: r.Equipamento || ''
+        id: String(r.ID_Exercicio), nome: r.Nome || r.Nome_Exercicio || '',
+        grupo: r.Grupo_Muscular || r.Grupo || '', equip: r.Equipamento || ''
       }));
     }
 
